@@ -19,21 +19,20 @@ jobs:
         with:
           go-version: '1.22'
 
-      - name: Clone geosite builder
+      - name: Install geosite builder
         run: |
-          git clone https://github.com/v2fly/domain-list-community.git builder
+          go install github.com/v2fly/v2ray-core/v5/cmd/test/geosite@latest
 
-      - name: Prepare custom geosite list
+      - name: Build data folder
         run: |
-          mkdir -p builder/data
-          cp domain.txt builder/data/mywhitelist
+          mkdir data
+          cp domain.txt data/mywhitelist
 
-      - name: Build geosite.dat
+      - name: Generate geosite.dat
         run: |
-          cd builder
-          go run . --output ../geosite.dat
+          geosite -c data -o geosite.dat
 
-      - name: Commit geosite.dat
+      - name: Commit result
         run: |
           git config user.name github-actions
           git config user.email github-actions@github.com
