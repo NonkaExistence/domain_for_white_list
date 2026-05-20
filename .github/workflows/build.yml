@@ -19,18 +19,18 @@ jobs:
         with:
           go-version: '1.22'
 
-      - name: Install geosite builder
+      - name: Install sing-box
         run: |
-          go install github.com/v2fly/v2ray-core/v5/cmd/test/geosite@latest
+          go install github.com/sagernet/sing-box/cmd/sing-box@latest
 
-      - name: Build data folder
+      - name: Prepare domain list
         run: |
-          mkdir data
-          cp domain.txt data/mywhitelist
+          mkdir -p rules
+          cp domain.txt rules/mywhitelist.txt
 
-      - name: Generate geosite.dat
+      - name: Build geosite.dat
         run: |
-          geosite -c data -o geosite.dat
+          sing-box geosite compile rules geosite.dat
 
       - name: Commit result
         run: |
