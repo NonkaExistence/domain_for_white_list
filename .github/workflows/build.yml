@@ -1,0 +1,43 @@
+name: Build geosite.dat
+
+on:
+  push:
+    paths:
+      - 'domain.txt'
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Setup Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.22'
+
+      - name: Clone geosite builder
+        run: |
+          git clone https://github.com/v2fly/domain-list-community.git builder
+
+      - name: Prepare custom geosite list
+        run: |
+          mkdir -p builder/data
+          cp domain.txt builder/data/mywhitelist
+
+      - name: Build geosite.dat
+        run: |
+          cd builder
+          go run . --output ../geosite.dat
+
+      - name: Commit geosite.dat
+        run: |
+          git config user.name github-actions
+          git config user.email github-actions@github.com
+
+          git add geosite.dat
+          git commit -m "auto build geosite.dat" || exit 0
+          git push
